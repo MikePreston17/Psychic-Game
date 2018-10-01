@@ -2,18 +2,19 @@
  *	Date: "09-30-2018"
  */
 
-
 /* GLOBALS
  */
-
 var wins, losses, guess, answer, guessesLeft,
-    guessList, MAX_GUESSES = 3;
+    guessList,
+    MAX_GUESSES = 9;
 var letters = alphabet();
 
+/*Listeners
+ */
 window.addEventListener('load', init)
 
 function init() {
-    setAnswer();
+    setCPUAnswer();
     guessList = [];
     guessesLeft = MAX_GUESSES;
     wins = losses = 0;
@@ -23,45 +24,55 @@ function init() {
 }
 
 function render() {
-    // console.log('called render()');
     $('guesses-remaining').innerText = 'Guesses Left: ' + guessesLeft;
     $('losses').innerText = 'Losses: ' + losses;
     $('wins').innerText = 'Wins: ' + wins;
+    $('player-guesses').innerText = "Your guesses so far: " + guessList.join(", ");
 }
 
 document.onkeyup = function (event) {
-
-    let win = false;
     guess = event.key.toLowerCase();
+    determineWinner(guess);
+}
 
-    if (guess === 'f5') return;
+function determineWinner(key) {
 
+    //<< Fails >>
+    if (guess === 'f5')
+        return;
     if (!letters.includes(guess)) {
         alert('That\'s not even a letter...')
         return;
     }
+    if (guessList.includes(guess)) {
+        alert('Seriously?  You already picked that one!');
+        return;
+    }
 
+    // <<main logic>
     guessesLeft--;
     guessList.push(guess);
 
-    console.log('guess: ', guess);
+    //<< render before, not after logic >>
+    render();
 
-    console.log('remaining guesses', guessesLeft);
+    if (guess === answer && guessesLeft >= 0)
+        handleWin()
+    else if (guessesLeft <= 0)
+        handleLoss()
+}
 
-    if (guess == answer) {
-        if (guessesLeft >= 0) {
-            wins++
-            alert('You win!');
-            console.log('You win!');
-        }
-        render();
-        restart();
-    } else {
-        losses++;
-        alert('You LOST!');
-        render()
-        restart()
-    }
+function handleLoss() {
+    losses++;
+    alert('You LOST!');
+    restart()
+}
+
+function handleWin() {
+    wins++;
+    alert('You win!');
+    console.log('You win!');
+    restart();
 }
 
 function generateCharArray(first, last) {
@@ -88,14 +99,13 @@ function getRandom(list) {
 }
 
 function restart() {
-    setAnswer();
+    setCPUAnswer();
     guessesLeft = MAX_GUESSES;
-    $('guesses-remaining').innerText = 'Guesses Left: ' + guessesLeft;
-    console.log('restart()');
+    guessList = [];
+    render();
 }
 
-function setAnswer() {
-    console.log('', letters);
+function setCPUAnswer() {
     answer = getRandom(letters);
     console.log('super secret answer: ', answer); //(PSST!)
 }
