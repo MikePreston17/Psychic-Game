@@ -4,7 +4,7 @@
 
 /* GLOBALS
  */
-var wins, losses, guess, answer, guessesLeft,
+var wins, losses, answer, guessesLeft,
     guessList,
     MAX_GUESSES = 9;
 var letters = alphabet();
@@ -35,7 +35,7 @@ document.onkeyup = function (event) {
     determineWinner(guess);
 }
 
-function determineWinner(key) {
+function determineWinner(guess) {
 
     //<< Fails >>
     if (guess === 'f5')
@@ -49,17 +49,14 @@ function determineWinner(key) {
         return;
     }
 
-    // <<main logic>
     guessesLeft--;
     guessList.push(guess);
 
-    //<< render before, not after logic >>
-    render();
-
-    if (guess === answer && guessesLeft >= 0)
-        handleWin()
-    else if (guessesLeft <= 0)
-        handleLoss()
+    // <<game logic>
+    (guess === answer && guessesLeft >= 0) ?
+    handleWin(): (guessesLeft <= 0) ?
+        handleLoss() :
+        render()
 }
 
 function handleLoss() {
@@ -71,7 +68,6 @@ function handleLoss() {
 function handleWin() {
     wins++;
     alert('You win!');
-    console.log('You win!');
     restart();
 }
 
